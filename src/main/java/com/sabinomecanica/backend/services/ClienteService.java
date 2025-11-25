@@ -2,7 +2,6 @@ package com.sabinomecanica.backend.services;
 
 import com.sabinomecanica.backend.models.Cliente;
 import com.sabinomecanica.backend.repositories.ClienteRepository;
-import com.sabinomecanica.backend.repositories.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +14,10 @@ import java.util.UUID;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final EnderecoRepository enderecoRepository;
 
     @Autowired
-    public ClienteService(ClienteRepository clienteRepository, EnderecoRepository enderecoRepository) {
+    public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-        this.enderecoRepository = enderecoRepository;
     }
 
     // Método para buscar todos os clientes
@@ -36,11 +33,6 @@ public class ClienteService {
     // Método para salvar/atualizar um cliente
     @Transactional
     public Cliente salvar(Cliente cliente) {
-
-        if (cliente.getEndereco() != null) {
-            enderecoRepository.save(cliente.getEndereco());
-        }
-
         return clienteRepository.save(cliente);
     }
 

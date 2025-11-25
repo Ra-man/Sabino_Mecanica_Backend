@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,28 +24,23 @@ public class Servico {
 
     private String descricao;
 
+    private double preco_peca_pago;
+
+    private double preco_peca_cobrado;
+
+    private double preco_mao_obra;
+
     private double valor_total;
 
-    @OneToMany(mappedBy = "servico")
-    private List<ItemServico> itensServico;
-
-    public List<ItemServico> getItemServicos() {
-        return itensServico;
-    }
+    private String Status;
 
     @ManyToOne
     @JoinColumn(name = "id_carro", nullable = false)
     private Carro carro;
 
-
     @ManyToOne
-    @JoinColumn(name = "cpf_cliente", nullable = false)
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
-
-
-    @ManyToOne
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
 
     public UUID getId() {
         return id;
@@ -88,12 +82,36 @@ public class Servico {
         this.descricao = descricao;
     }
 
-    public double getValor_total() {
-        return valor_total;
+    public double getPreco_peca_pago() {
+        return preco_peca_pago;
+    }
+
+    public void setPreco_peca_pago(double preco_peca_pago) {
+        this.preco_peca_pago = preco_peca_pago;
+    }
+
+    public double getPreco_peca_cobrado() {
+        return preco_peca_cobrado;
+    }
+
+    public void setPreco_peca_cobrado(double preco_peca_cobrado) {
+        this.preco_peca_cobrado = preco_peca_cobrado;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
     }
 
     public void setValor_total(double valor_total) {
         this.valor_total = valor_total;
+    }
+
+    public double getValor_total() {
+        return valor_total;
     }
 
     public Carro getCarro() {
@@ -112,11 +130,11 @@ public class Servico {
         this.cliente = cliente;
     }
 
-    public Categoria getCategoria() {
-        return categoria;
+    public double getPreco_mao_obra() {
+        return preco_mao_obra;
     }
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
+    public void setPreco_mao_obra(double preco_mao_obra) {
+        this.preco_mao_obra = preco_mao_obra;
     }
 }

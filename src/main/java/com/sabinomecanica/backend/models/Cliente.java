@@ -22,9 +22,7 @@ public class Cliente {
 
     private String telefone;
 
-    @ManyToOne
-    @JoinColumn(name = "id_endereco", referencedColumnName = "id") // Mapeia a FK id_endereco
-    private Endereco endereco;
+    private String situacao;
 
     public UUID getId() {
         return id;
@@ -58,11 +56,11 @@ public class Cliente {
         this.telefone = telefone;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public String getSituacao() {
+        return situacao;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public void setSituacao(String situacao) {
+        this.situacao = situacao;
     }
 }

@@ -14,8 +14,12 @@ public class Carro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     private String modelo;
+
     private String placa;
+
+    private String url_foto;
 
     public UUID getId() {
         return id;
@@ -39,5 +43,13 @@ public class Carro {
 
     public void setPlaca(String placa) {
         this.placa = placa;
+    }
+
+    public String getUrl_foto() {
+        return url_foto;
+    }
+
+    public void setUrl_foto(String url_foto) {
+        this.url_foto = url_foto;
     }
 }

@@ -38,10 +38,6 @@ public class ClienteController {
     @PostMapping
     public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
 
-        if (cliente.getEndereco() == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
         Cliente novoCliente = clienteService.salvar(cliente);
 
         return new ResponseEntity<>(novoCliente, HttpStatus.CREATED);
@@ -53,11 +49,8 @@ public class ClienteController {
 
             clienteExistente.setNome(clienteDetalhes.getNome());
             clienteExistente.setTelefone(clienteDetalhes.getTelefone());
-
-            if (clienteDetalhes.getEndereco() != null) {
-                clienteExistente.setEndereco(clienteDetalhes.getEndereco());
-            }
-
+            clienteExistente.setSituacao(clienteExistente.getSituacao());
+            clienteExistente.setCpf(clienteExistente.getCpf());
             Cliente clienteAtualizado = clienteService.salvar(clienteExistente);
             return ResponseEntity.ok(clienteAtualizado);
 

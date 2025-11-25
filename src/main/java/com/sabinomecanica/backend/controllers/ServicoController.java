@@ -32,11 +32,6 @@ public class ServicoController {
 
     @PostMapping
     public ResponseEntity<Servico> cadastrar(@RequestBody Servico servico) {
-
-        if (servico.getItemServicos() == null || servico.getItemServicos().isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
         Servico novoServico = servicoService.salvar(servico);
         return new ResponseEntity<>(novoServico, HttpStatus.CREATED);
     }
@@ -48,10 +43,15 @@ public class ServicoController {
             servicoExistente.setData_ini(servicoDetalhes.getData_ini());
             servicoExistente.setData_fim(servicoDetalhes.getData_fim());
             servicoExistente.setDescricao(servicoDetalhes.getDescricao());
+            servicoExistente.setStatus(servicoDetalhes.getStatus());
+            servicoExistente.setPreco_peca_cobrado(servicoDetalhes.getPreco_peca_cobrado());
+            servicoExistente.setPreco_peca_pago(servicoDetalhes.getPreco_peca_pago());
+            servicoExistente.setData_garantia(servicoDetalhes.getData_garantia());
+            servicoExistente.setPreco_mao_obra(servicoDetalhes.getPreco_mao_obra());
+            servicoExistente.setValor_total(servicoDetalhes.getValor_total());
+            servicoExistente.setCarro(servicoDetalhes.getCarro());
+            servicoExistente.setCliente(servicoDetalhes.getCliente());
 
-            // Nota: Atualizar os ItemServicos é mais complexo, exigiria mais lógica no Service
-            // e normalmente se usa um DTO para evitar salvar a lista inteira novamente.
-            // Para o básico, chamamos o salvar que recalcula o valor:
             Servico atualizado = servicoService.salvar(servicoExistente);
             return ResponseEntity.ok(atualizado);
 

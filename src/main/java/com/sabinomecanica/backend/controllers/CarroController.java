@@ -40,6 +40,7 @@ public class CarroController {
         return carroService.buscarPorId(id).map(carroExistente -> {
             carroExistente.setModelo(carroDetalhes.getModelo());
             carroExistente.setPlaca(carroDetalhes.getPlaca());
+            carroExistente.setUrl_foto(carroDetalhes.getUrl_foto());
             Carro atualizado = carroService.salvar(carroExistente);
             return ResponseEntity.ok(atualizado);
         }).orElseGet(() -> ResponseEntity.notFound().build());
