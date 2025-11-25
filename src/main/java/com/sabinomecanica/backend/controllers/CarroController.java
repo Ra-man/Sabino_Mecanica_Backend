@@ -32,7 +32,7 @@ public class CarroController {
     @PostMapping
     public ResponseEntity<Carro> cadastrar(@RequestBody Carro carro) {
         Carro novoCarro = carroService.salvar(carro);
-        return new ResponseEntity<>(novoCarro, HttpStatus.CREATED);
+        return new ResponseEntity<>(novoCarro, HttpStatus.CREATED );
     }
 
     @PutMapping("/{id}")
