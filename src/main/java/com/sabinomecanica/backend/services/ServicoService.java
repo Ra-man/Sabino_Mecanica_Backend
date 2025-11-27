@@ -2,6 +2,7 @@ package com.sabinomecanica.backend.services;
 
 
 import com.sabinomecanica.backend.models.Servico;
+import com.sabinomecanica.backend.models.ServicoPeca;
 import com.sabinomecanica.backend.repositories.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,13 @@ public class ServicoService {
 
     @Transactional
     public Servico salvar(Servico servico) {
+        if (servico.getItens() != null) {
+            for (ServicoPeca item : servico.getItens()) {
+                item.setServico(servico);
+            }
+        }
         return servicoRepository.save(servico);
+
     }
 
     public void deletar(UUID id) {

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,10 +26,6 @@ public class Servico {
 
     private String descricao;
 
-    private double preco_peca_pago;
-
-    private double preco_peca_cobrado;
-
     private double preco_mao_obra;
 
     private double valor_total;
@@ -35,12 +33,15 @@ public class Servico {
     private String Status;
 
     @ManyToOne
-    @JoinColumn(name = "id_carro", nullable = false)
+    @JoinColumn(name = "id_carro")
     private Carro carro;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente", nullable = false)
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServicoPeca> itens = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -82,22 +83,6 @@ public class Servico {
         this.descricao = descricao;
     }
 
-    public double getPreco_peca_pago() {
-        return preco_peca_pago;
-    }
-
-    public void setPreco_peca_pago(double preco_peca_pago) {
-        this.preco_peca_pago = preco_peca_pago;
-    }
-
-    public double getPreco_peca_cobrado() {
-        return preco_peca_cobrado;
-    }
-
-    public void setPreco_peca_cobrado(double preco_peca_cobrado) {
-        this.preco_peca_cobrado = preco_peca_cobrado;
-    }
-
     public String getStatus() {
         return Status;
     }
@@ -136,5 +121,13 @@ public class Servico {
 
     public void setPreco_mao_obra(double preco_mao_obra) {
         this.preco_mao_obra = preco_mao_obra;
+    }
+
+    public List<ServicoPeca> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<ServicoPeca> itens) {
+        this.itens = itens;
     }
 }

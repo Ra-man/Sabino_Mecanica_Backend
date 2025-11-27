@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/servicos")
+@RequestMapping("/servicos")
 public class ServicoController {
 
     @Autowired
@@ -44,13 +45,12 @@ public class ServicoController {
             servicoExistente.setData_fim(servicoDetalhes.getData_fim());
             servicoExistente.setDescricao(servicoDetalhes.getDescricao());
             servicoExistente.setStatus(servicoDetalhes.getStatus());
-            servicoExistente.setPreco_peca_cobrado(servicoDetalhes.getPreco_peca_cobrado());
-            servicoExistente.setPreco_peca_pago(servicoDetalhes.getPreco_peca_pago());
             servicoExistente.setData_garantia(servicoDetalhes.getData_garantia());
             servicoExistente.setPreco_mao_obra(servicoDetalhes.getPreco_mao_obra());
             servicoExistente.setValor_total(servicoDetalhes.getValor_total());
             servicoExistente.setCarro(servicoDetalhes.getCarro());
             servicoExistente.setCliente(servicoDetalhes.getCliente());
+            servicoExistente.setItens(servicoDetalhes.getItens());
 
             Servico atualizado = servicoService.salvar(servicoExistente);
             return ResponseEntity.ok(atualizado);

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "carro")
+@Table(name = "carros")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Carro {
@@ -20,6 +20,10 @@ public class Carro {
     private String placa;
 
     private String url_foto;
+
+    @ManyToOne
+    @JoinColumn(name = "id_cliente")
+    private Cliente cliente;
 
     public UUID getId() {
         return id;
@@ -51,5 +55,13 @@ public class Carro {
 
     public void setUrl_foto(String url_foto) {
         this.url_foto = url_foto;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }

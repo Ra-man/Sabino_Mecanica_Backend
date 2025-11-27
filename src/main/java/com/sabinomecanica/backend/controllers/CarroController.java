@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/carros")
+@RequestMapping("/carros")
 public class CarroController {
 
     @Autowired
@@ -41,6 +42,7 @@ public class CarroController {
             carroExistente.setModelo(carroDetalhes.getModelo());
             carroExistente.setPlaca(carroDetalhes.getPlaca());
             carroExistente.setUrl_foto(carroDetalhes.getUrl_foto());
+            carroExistente.setCliente(carroDetalhes.getCliente());
             Carro atualizado = carroService.salvar(carroExistente);
             return ResponseEntity.ok(atualizado);
         }).orElseGet(() -> ResponseEntity.notFound().build());
