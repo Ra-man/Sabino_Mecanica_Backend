@@ -25,7 +25,7 @@ public class ServicoPeca {
     private double precoCobrado;
 
     @ManyToOne
-    @JoinColumn(name = "id_servico", nullable = false)
+    @JoinColumn(name = "id_servico")
     @JsonIgnore // evita loop infinito no JSON (servico -> itens -> servico...)
     private Servico servico;
 

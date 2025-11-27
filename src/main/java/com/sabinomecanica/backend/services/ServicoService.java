@@ -28,13 +28,22 @@ public class ServicoService {
 
     @Transactional
     public Servico salvar(Servico servico) {
+
+        double totalPecasCobradas = 0.0;
+
+        // Garante o vínculo das peças com o serviço
         if (servico.getItens() != null) {
             for (ServicoPeca item : servico.getItens()) {
-                item.setServico(servico);
+                item.setServico(servico);            // <<< ESSA LINHA É OBRIGATÓRIA
+                totalPecasCobradas += item.getPrecoCobrado();
             }
         }
-        return servicoRepository.save(servico);
 
+        // Calcula o valor_total no BACK (mais seguro)
+        double maoObra = servico.getPreco_mao_obra();
+        servico.setValor_total(totalPecasCobradas + maoObra);
+
+        return servicoRepository.save(servico);
     }
 
     public void deletar(UUID id) {
