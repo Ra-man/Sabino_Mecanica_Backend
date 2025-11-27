@@ -18,14 +18,17 @@ public class ServicoService {
     @Autowired
     private ServicoRepository servicoRepository;
 
+    // Lista todos os serviços
     public List<Servico> buscarTodos() {
         return servicoRepository.findAll();
     }
 
+    // Busca por ID
     public Optional<Servico> buscarPorId(UUID id) {
         return servicoRepository.findById(id);
     }
 
+    // Salva (criar/atualizar) o serviço + peças
     @Transactional
     public Servico salvar(Servico servico) {
 
@@ -34,19 +37,22 @@ public class ServicoService {
         // Garante o vínculo das peças com o serviço
         if (servico.getItens() != null) {
             for (ServicoPeca item : servico.getItens()) {
-                item.setServico(servico);            // <<< ESSA LINHA É OBRIGATÓRIA
+                // ESSENCIAL: seta o serviço dono do item (preenche id_servico)
+                item.setServico(servico);
                 totalPecasCobradas += item.getPrecoCobrado();
             }
         }
 
-        // Calcula o valor_total no BACK (mais seguro)
+        // Calcula o valor_total no BACK (mais seguro que confiar no front)
         double maoObra = servico.getPreco_mao_obra();
         servico.setValor_total(totalPecasCobradas + maoObra);
 
+        // Salva serviço + itens em cascata
         return servicoRepository.save(servico);
     }
 
+    // Deleta por ID
     public void deletar(UUID id) {
-        servicoRepository.deleteById(UUID.fromString(String.valueOf(id)));
+        servicoRepository.deleteById(id);
     }
 }
