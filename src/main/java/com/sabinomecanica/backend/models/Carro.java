@@ -1,67 +1,61 @@
 package com.sabinomecanica.backend.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
 import java.util.UUID;
 
 @Entity
 @Table(name = "carros")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Carro {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String modelo;
-
     private String placa;
+    private String modelo;
+    private String marca;
+    private String cor;
 
-    private String url_foto;
+    private String fotoUrl;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    public UUID getId() {
-        return id;
-    }
+    // ====== CONSTRUTOR VAZIO ======
+    public Carro() {}
 
-    public void setId(UUID id) {
+    // ====== CONSTRUTOR COMPLETO ======
+    public Carro(UUID id, String placa, String modelo, String marca, String cor, String fotoUrl, Cliente cliente) {
         this.id = id;
-    }
-
-    public String getModelo() {
-        return modelo;
-    }
-
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
-    }
-
-    public String getPlaca() {
-        return placa;
-    }
-
-    public void setPlaca(String placa) {
         this.placa = placa;
-    }
-
-    public String getUrl_foto() {
-        return url_foto;
-    }
-
-    public void setUrl_foto(String url_foto) {
-        this.url_foto = url_foto;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
+        this.modelo = modelo;
+        this.marca = marca;
+        this.cor = cor;
+        this.fotoUrl = fotoUrl;
         this.cliente = cliente;
     }
+
+    // ====== GETTERS E SETTERS ======
+
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public String getPlaca() { return placa; }
+    public void setPlaca(String placa) { this.placa = placa; }
+
+    public String getModelo() { return modelo; }
+    public void setModelo(String modelo) { this.modelo = modelo; }
+
+    public String getMarca() { return marca; }
+    public void setMarca(String marca) { this.marca = marca; }
+
+    public String getCor() { return cor; }
+    public void setCor(String cor) { this.cor = cor; }
+
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
+
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 }

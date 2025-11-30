@@ -1,15 +1,13 @@
 package com.sabinomecanica.backend.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "cliente")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Cliente {
 
     @Id
@@ -17,12 +15,27 @@ public class Cliente {
     private UUID id;
 
     private String cpf;
-
     private String nome;
-
     private String telefone;
 
+    // ATIVO / INATIVO
     private String situacao;
+
+    // Relação 1:N com Carro
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Carro> carros = new ArrayList<>();
+
+    public Cliente() {
+    }
+
+    public Cliente(UUID id, String cpf, String nome, String telefone, String situacao, List<Carro> carros) {
+        this.id = id;
+        this.cpf = cpf;
+        this.nome = nome;
+        this.telefone = telefone;
+        this.situacao = situacao;
+        this.carros = carros;
+    }
 
     public UUID getId() {
         return id;
@@ -62,5 +75,13 @@ public class Cliente {
 
     public void setSituacao(String situacao) {
         this.situacao = situacao;
+    }
+
+    public List<Carro> getCarros() {
+        return carros;
+    }
+
+    public void setCarros(List<Carro> carros) {
+        this.carros = carros;
     }
 }

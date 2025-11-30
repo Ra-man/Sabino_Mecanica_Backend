@@ -1,58 +1,126 @@
 package com.sabinomecanica.backend.services;
 
-
+import com.sabinomecanica.backend.models.Parcela;
 import com.sabinomecanica.backend.models.Servico;
 import com.sabinomecanica.backend.models.ServicoPeca;
+import com.sabinomecanica.backend.models.enums.FormaPagamento;
 import com.sabinomecanica.backend.repositories.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ServicoService {
 
-    @Autowired
-    private ServicoRepository servicoRepository;
+    private final ServicoRepository servicoRepository;
 
-    // Lista todos os serviços
+    @Autowired
+    public ServicoService(ServicoRepository servicoRepository) {
+        this.servicoRepository = servicoRepository;
+    }
+
     public List<Servico> buscarTodos() {
         return servicoRepository.findAll();
     }
 
-    // Busca por ID
-    public Optional<Servico> buscarPorId(UUID id) {
-        return servicoRepository.findById(id);
+    public Servico buscarPorId(UUID id) {
+        return servicoRepository.findById(id).orElse(null);
     }
 
-    // Salva (criar/atualizar) o serviço + peças
     @Transactional
     public Servico salvar(Servico servico) {
 
-        double totalPecasCobradas = 0.0;
+        // ========= VINCULA PEÇAS E CALCULA TOTAL GASTO / COBRADO =========
+        double totalGasto = 0.0;
+        double totalCobradoPecas = 0.0;
 
-        // Garante o vínculo das peças com o serviço
-        if (servico.getItens() != null) {
-            for (ServicoPeca item : servico.getItens()) {
-                // ESSENCIAL: seta o serviço dono do item (preenche id_servico)
-                item.setServico(servico);
-                totalPecasCobradas += item.getPrecoCobrado();
+        if (servico.getPecas() == null) {
+            servico.setPecas(new ArrayList<>());
+        }
+
+        for (ServicoPeca peca : servico.getPecas()) {
+            peca.setServico(servico);
+
+            if (peca.getPrecoCusto() != null) {
+                totalGasto += peca.getPrecoCusto();
+            }
+            if (peca.getPrecoVenda() != null) {
+                totalCobradoPecas += peca.getPrecoVenda();
             }
         }
 
-        // Calcula o valor_total no BACK (mais seguro que confiar no front)
-        double maoObra = servico.getPreco_mao_obra();
-        servico.setValor_total(totalPecasCobradas + maoObra);
+        double valorMaoObra = servico.getValorMaoObra() != null ? servico.getValorMaoObra() : 0.0;
+        double valorBase = totalCobradoPecas + valorMaoObra;
 
-        // Salva serviço + itens em cascata
+        // ========= CALCULA TOTAL COM JUROS (SE CRÉDITO PARCELADO) =========
+        double valorTotal = valorBase;
+        FormaPagamento fp = servico.getFormaPagamento();
+
+        if (fp == FormaPagamento.CREDITO_PARCELADO &&
+                servico.getNumeroParcelas() != null &&
+                servico.getNumeroParcelas() > 1 &&
+                servico.getJurosPercentual() != null &&
+                servico.getJurosPercentual() > 0.0) {
+
+            double juros = servico.getJurosPercentual() / 100.0;
+            valorTotal = valorBase * (1.0 + juros);
+        }
+
+        servico.setValorGasto(totalGasto);
+        servico.setValorTotal(valorTotal);
+
+        // ========= VINCULA PARCELAS AO SERVIÇO (SE TIVER) =========
+        if (servico.getParcelas() == null) {
+            servico.setParcelas(new ArrayList<>());
+        }
+
+        for (Parcela parcela : servico.getParcelas()) {
+            parcela.setServico(servico);
+            if (parcela.getPago() == null) {
+                parcela.setPago(false);
+            }
+        }
+
+        // ========= STATUS PADRÃO =========
+        if (servico.getStatus() == null || servico.getStatus().isBlank()) {
+            servico.setStatus("EM_ANDAMENTO");
+        }
+
         return servicoRepository.save(servico);
     }
 
-    // Deleta por ID
-    public void deletar(UUID id) {
+    @Transactional
+    public Servico atualizarStatus(UUID id, String novoStatus) {
+        Servico servico = servicoRepository.findById(id).orElseThrow();
+        servico.setStatus(novoStatus);
+        return servicoRepository.save(servico);
+    }
+
+    @Transactional
+    public Servico atualizarParcelas(UUID id, List<Parcela> novasParcelas) {
+        Servico servico = servicoRepository.findById(id).orElseThrow();
+
+        // limpa antigas
+        servico.getParcelas().clear();
+
+        // adiciona novas
+        for (Parcela p : novasParcelas) {
+            p.setServico(servico);
+            if (p.getPago() == null) {
+                p.setPago(false);
+            }
+            servico.getParcelas().add(p);
+        }
+
+        return servicoRepository.save(servico);
+    }
+
+    @Transactional
+    public void excluir(UUID id) {
         servicoRepository.deleteById(id);
     }
 }
