@@ -1,63 +1,42 @@
+// src/main/java/com/sabinomecanica/backend/controllers/ClienteController.java
 package com.sabinomecanica.backend.controllers;
 
 import com.sabinomecanica.backend.models.Cliente;
-import com.sabinomecanica.backend.services.ClienteService;
+import com.sabinomecanica.backend.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
-// Controlador REST para Cliente
 @RestController
 @RequestMapping("/clientes")
-@CrossOrigin(origins = "http://localhost:5173") // porta do front (ajusta se for outra)
+@CrossOrigin(origins = "http://localhost:5173")   // <<< LIBERA O FRONT
 public class ClienteController {
 
     @Autowired
-    private ClienteService clienteService;
+    private ClienteRepository clienteRepository;
 
-    // GET /clientes -> lista todos
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarTodos() {
-        List<Cliente> clientes = clienteService.buscarTodos();
-        return ResponseEntity.ok(clientes);
+    public List<Cliente> listarTodos() {
+        return clienteRepository.findAll();
     }
 
-    // GET /clientes/{id} -> busca um cliente
-    @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable UUID id) {
-        return clienteService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // POST /clientes -> cria novo cliente
     @PostMapping
-    public ResponseEntity<Cliente> criar(@RequestBody Cliente cliente) {
-        Cliente salvo = clienteService.salvar(cliente);
-        return ResponseEntity.ok(salvo);
+    public Cliente criar(@RequestBody Cliente cliente) {
+        // deixa o ID nulo pra JPA gerar
+        cliente.setId(null);
+        return clienteRepository.save(cliente);
     }
 
-    // PUT /clientes/{id} -> atualiza um cliente
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable UUID id,
-                                             @RequestBody Cliente clienteAtualizado) {
-        return clienteService.atualizar(id, clienteAtualizado)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Cliente atualizar(@PathVariable("id") String id,
+                             @RequestBody Cliente cliente) {
+        cliente.setId(java.util.UUID.fromString(id));
+        return clienteRepository.save(cliente);
     }
 
-    // DELETE /clientes/{id} -> exclui cliente (se não tiver carros)
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluir(@PathVariable UUID id) {
-        try {
-            clienteService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            // volta 400 com a mensagem (ex: "cliente possui carros vinculados")
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public void excluir(@PathVariable("id") String id) {
+        clienteRepository.deleteById(java.util.UUID.fromString(id));
     }
 }

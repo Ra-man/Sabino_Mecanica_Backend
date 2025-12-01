@@ -1,7 +1,8 @@
+// src/main/java/com/sabinomecanica/backend/models/Cliente.java
 package com.sabinomecanica.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,31 +12,23 @@ import java.util.UUID;
 public class Cliente {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
-    private String cpf;
     private String nome;
+
     private String telefone;
 
-    // ATIVO / INATIVO
-    private String situacao;
+    private String cpf;
 
-    // Relação 1:N com Carro
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = false)
+    private String situacao; // ATIVO / INATIVO
+
+    // IMPEDIR LOOP INFINITO → Cliente → Carros → Cliente
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // ← ESSA LINHA RESOLVE O TEU PROBLEMA
     private List<Carro> carros = new ArrayList<>();
 
-    public Cliente() {
-    }
-
-    public Cliente(UUID id, String cpf, String nome, String telefone, String situacao, List<Carro> carros) {
-        this.id = id;
-        this.cpf = cpf;
-        this.nome = nome;
-        this.telefone = telefone;
-        this.situacao = situacao;
-        this.carros = carros;
-    }
+    public Cliente() {}
 
     public UUID getId() {
         return id;
@@ -43,14 +36,6 @@ public class Cliente {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
     }
 
     public String getNome() {
@@ -67,6 +52,14 @@ public class Cliente {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public String getSituacao() {
