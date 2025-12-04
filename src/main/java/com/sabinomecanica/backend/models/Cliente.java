@@ -1,14 +1,11 @@
-// src/main/java/com/sabinomecanica/backend/models/Cliente.java
 package com.sabinomecanica.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "cliente")
 public class Cliente {
 
     @Id
@@ -16,65 +13,39 @@ public class Cliente {
     private UUID id;
 
     private String nome;
-
     private String telefone;
-
     private String cpf;
 
-    private String situacao; // ATIVO / INATIVO
+    @Enumerated(EnumType.STRING)
+    private SituacaoCliente situacao;
 
-    // IMPEDIR LOOP INFINITO → Cliente → Carros → Cliente
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // ← ESSA LINHA RESOLVE O TEU PROBLEMA
-    private List<Carro> carros = new ArrayList<>();
+    @JsonIgnore
+    private List<Carro> carros;
 
-    public Cliente() {}
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Servico> servicos;
 
-    public UUID getId() {
-        return id;
-    }
+    // GETTERS & SETTERS
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public String getTelefone() {
-        return telefone;
-    }
+    public SituacaoCliente getSituacao() { return situacao; }
+    public void setSituacao(SituacaoCliente situacao) { this.situacao = situacao; }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
+    public List<Carro> getCarros() { return carros; }
+    public void setCarros(List<Carro> carros) { this.carros = carros; }
 
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getSituacao() {
-        return situacao;
-    }
-
-    public void setSituacao(String situacao) {
-        this.situacao = situacao;
-    }
-
-    public List<Carro> getCarros() {
-        return carros;
-    }
-
-    public void setCarros(List<Carro> carros) {
-        this.carros = carros;
-    }
+    public List<Servico> getServicos() { return servicos; }
+    public void setServicos(List<Servico> servicos) { this.servicos = servicos; }
 }

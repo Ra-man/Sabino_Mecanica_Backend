@@ -1,126 +1,99 @@
 package com.sabinomecanica.backend.services;
 
-import com.sabinomecanica.backend.models.Parcela;
 import com.sabinomecanica.backend.models.Servico;
 import com.sabinomecanica.backend.models.ServicoPeca;
-import com.sabinomecanica.backend.models.enums.FormaPagamento;
 import com.sabinomecanica.backend.repositories.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class ServicoService {
 
-    private final ServicoRepository servicoRepository;
-
     @Autowired
-    public ServicoService(ServicoRepository servicoRepository) {
-        this.servicoRepository = servicoRepository;
-    }
+    private ServicoRepository servicoRepository;
 
+    // ========================
+    // LISTAR TODOS
+    // ========================
     public List<Servico> buscarTodos() {
         return servicoRepository.findAll();
     }
 
+    // ========================
+    // BUSCAR POR ID
+    // ========================
     public Servico buscarPorId(UUID id) {
         return servicoRepository.findById(id).orElse(null);
     }
 
+    // ========================
+    // SALVAR / ATUALIZAR
+    // ========================
     @Transactional
     public Servico salvar(Servico servico) {
 
-        // ========= VINCULA PEÇAS E CALCULA TOTAL GASTO / COBRADO =========
+        // 🔴 ATENÇÃO AQUI:
+        // Use o NOME DO CAMPO que está na tua entidade Servico.
+        // Se em Servico.java estiver "private List<ServicoPeca> pecas;",
+        // o getter é getPecas().
+        if (servico.getPecas() != null) {
+            for (ServicoPeca item : servico.getPecas()) {
+                // garante o vínculo da peça com o serviço
+                item.setServico(servico);
+            }
+        }
+
+        // Se tiver campos de valor na entidade Servico, dá pra somar aqui:
+        /*
         double totalGasto = 0.0;
         double totalCobradoPecas = 0.0;
 
-        if (servico.getPecas() == null) {
-            servico.setPecas(new ArrayList<>());
-        }
-
-        for (ServicoPeca peca : servico.getPecas()) {
-            peca.setServico(servico);
-
-            if (peca.getPrecoCusto() != null) {
-                totalGasto += peca.getPrecoCusto();
-            }
-            if (peca.getPrecoVenda() != null) {
-                totalCobradoPecas += peca.getPrecoVenda();
+        if (servico.getPecas() != null) {
+            for (ServicoPeca item : servico.getPecas()) {
+                if (item.getPrecoCusto() != null) {
+                    totalGasto += item.getPrecoCusto();
+                }
+                if (item.getPrecoVenda() != null) {
+                    totalCobradoPecas += item.getPrecoVenda();
+                }
             }
         }
 
-        double valorMaoObra = servico.getValorMaoObra() != null ? servico.getValorMaoObra() : 0.0;
-        double valorBase = totalCobradoPecas + valorMaoObra;
-
-        // ========= CALCULA TOTAL COM JUROS (SE CRÉDITO PARCELADO) =========
-        double valorTotal = valorBase;
-        FormaPagamento fp = servico.getFormaPagamento();
-
-        if (fp == FormaPagamento.CREDITO_PARCELADO &&
-                servico.getNumeroParcelas() != null &&
-                servico.getNumeroParcelas() > 1 &&
-                servico.getJurosPercentual() != null &&
-                servico.getJurosPercentual() > 0.0) {
-
-            double juros = servico.getJurosPercentual() / 100.0;
-            valorTotal = valorBase * (1.0 + juros);
-        }
-
+        Double maoObra = servico.getValorMaoObra() != null ? servico.getValorMaoObra() : 0.0;
         servico.setValorGasto(totalGasto);
-        servico.setValorTotal(valorTotal);
-
-        // ========= VINCULA PARCELAS AO SERVIÇO (SE TIVER) =========
-        if (servico.getParcelas() == null) {
-            servico.setParcelas(new ArrayList<>());
-        }
-
-        for (Parcela parcela : servico.getParcelas()) {
-            parcela.setServico(servico);
-            if (parcela.getPago() == null) {
-                parcela.setPago(false);
-            }
-        }
-
-        // ========= STATUS PADRÃO =========
-        if (servico.getStatus() == null || servico.getStatus().isBlank()) {
-            servico.setStatus("EM_ANDAMENTO");
-        }
+        servico.setValorTotal(totalCobradoPecas + maoObra);
+        */
 
         return servicoRepository.save(servico);
     }
 
+    // ========================
+    // DELETAR
+    // ========================
+    public void deletar(UUID id) {
+        if (servicoRepository.existsById(id)) {
+            servicoRepository.deleteById(id);
+        }
+    }
+
+    // ========================
+    // ATUALIZAR STATUS
+    // ========================
     @Transactional
     public Servico atualizarStatus(UUID id, String novoStatus) {
-        Servico servico = servicoRepository.findById(id).orElseThrow();
+        Servico servico = servicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
+
+        // Se o campo status for String na entidade:
         servico.setStatus(novoStatus);
-        return servicoRepository.save(servico);
-    }
 
-    @Transactional
-    public Servico atualizarParcelas(UUID id, List<Parcela> novasParcelas) {
-        Servico servico = servicoRepository.findById(id).orElseThrow();
-
-        // limpa antigas
-        servico.getParcelas().clear();
-
-        // adiciona novas
-        for (Parcela p : novasParcelas) {
-            p.setServico(servico);
-            if (p.getPago() == null) {
-                p.setPago(false);
-            }
-            servico.getParcelas().add(p);
-        }
+        // Se for ENUM, algo como:
+        // servico.setStatus(StatusServico.valueOf(novoStatus));
 
         return servicoRepository.save(servico);
-    }
-
-    @Transactional
-    public void excluir(UUID id) {
-        servicoRepository.deleteById(id);
     }
 }

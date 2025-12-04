@@ -1,5 +1,6 @@
 package com.sabinomecanica.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.UUID;
 
@@ -7,7 +8,7 @@ import java.util.UUID;
 public class ServicoPeca {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     private UUID id;
 
     private String nome;
@@ -15,19 +16,11 @@ public class ServicoPeca {
     private Double precoVenda;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "servico_id")
     private Servico servico;
 
-    public ServicoPeca() {}
-
-    public ServicoPeca(UUID id, String nome, Double precoCusto, Double precoVenda, Servico servico) {
-        this.id = id;
-        this.nome = nome;
-        this.precoCusto = precoCusto;
-        this.precoVenda = precoVenda;
-        this.servico = servico;
-    }
-
+    // GETTERS & SETTERS
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 

@@ -13,11 +13,12 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")                           // libera todos os endpoints
-                        .allowedOrigins("http://localhost:5173")      // origem do teu front (Vite)
-                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                registry.addMapping("/**")
+                        // LIBERA APENAS O FRONT
+                        .allowedOrigins("http://localhost:5173")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowCredentials(true);  // <-- PODE DEIXAR
             }
         };
     }
